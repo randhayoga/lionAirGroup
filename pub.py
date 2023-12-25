@@ -1,6 +1,7 @@
 # Import libraries
 import paho.mqtt.client as mqtt
-import datetime
+import buatJadwal
+import perbaruiJadwal
 import os
 import sys
 import json
@@ -27,6 +28,7 @@ def on_message(client, userdata, message):
     """
     print(f"Pesan diterima: {message.topic} {message.payload.decode("utf-8")}")
 
+
 # Membuat client Publisher
 print("Membuat client baru (publisher)...")
 client = mqtt.Client("Publisher")
@@ -42,138 +44,22 @@ time.sleep(2)
 # --------------------- Fungsi untuk Main Program ---------------------
 clearScreen = lambda: os.system("cls" if os.name in ("nt", "dos") else "clear")
 
-def validasiRute(idxAsal, idxTujuan):
-    """
-    Mengembalikan false jika asal sama dengan tujuan atau jika terdapat string kosong,
-    true jika sebaliknya
-
-    idxAsal: int, indeks bandara asal penerbangan
-    idxTujuan: int, indeks bandara tujuan penerbangan
-    """
-    if ((idxAsal == idxTujuan) or ((idxAsal <= 0) and (idxAsal >= 10)) or ((idxTujuan <= 0) and (idxTujuan >= 10))):
-        return False
-    else:
-        return True
-
-
-def validasiTanggal(tanggal):
-    """
-    Mengembalikan true jika format tanggal sesuai (DD-MM-YYYY), false jika sebaliknya
-
-    tanggal: string
-    """
-    try:
-        datetime.datetime.strptime(tanggal, "%d-%m-%Y")
-        return True
-    except ValueError:
-        return False
-
-
-def validasiWaktu(waktu):
-    """
-    Mengembalikan true jika format waktu sesuai (HH:MM), false jika sebaliknya
-
-    waktu: string
-    """
-    try:
-        datetime.datetime.strptime(waktu, "%H:%M")
-        return True
-    except ValueError:
-        return False
-
 
 def header():
     clearScreen()
     print("============= Program Jadwal Penerbangan =============\n")
 
 
-def inputKode():
+def menuBuatJadwal():
     """
-    Mengembalikan kode penerbangan Lion Air yang didapat dari masukan user
+    Membuat jadwal penerbangan baru secara lengkap dan menyimpannya ke dalam 
+    sebuah array
     """
-    header()
-    print("---------- Menu Input Kode Penerbangan ----------\n")
-    print("Contoh kode: '523'")
-
-    kode = input("Masukkan kode penerbangan : ")
-    while (kode in arrOfKode):
-        print("Kode penerbangan telah digunakan")
-        kode = input("Masukkan kode penerbangan : ")
-
-    return "JT" + kode
-
-
-def inputKota():
-    """
-    Mengembalikan kota asal dan kota tujuan penerbangan berdasarkan masukan user
-    """
-    header()
-    print("---------- Menu Pemilihan Kota Asal & Tujuan ----------\n")
-
-    # List kota
-    i = 1
-    for kota in arrOfKota:
-        print(f"({i}) {kota}")
-        i += 1
-
-    idxKotaAsal = int(input("\nMasukkan nomor kota asal   : "))
-    idxKotaTujuan = int(input("Masukkan nomor kota tujuan : "))
-
-    while (validasiRute(idxKotaAsal, idxKotaTujuan) == False):
-        print("Rute tidak valid, pastikan angka sudah sesuai!")
-        time.sleep(5)
-
-        header()
-        print("---------- Menu Pemilihan Kota Asal & Tujuan ----------\n")    
-
-        # List kota
-        i = 1
-        for kota in arrOfKota:
-            print(f"({i}) {kota}")
-            i += 1
-
-        idxKotaAsal = int(input("\nMasukkan nomor kota asal   : "))
-        idxKotaTujuan = int(input("Masukkan nomor kota tujuan : "))
-
-    return idxKotaAsal-1, idxKotaTujuan-1
-
-def inputJadwal():
-    """
-    
-    """
-    header()
-    print("---------- Menu Input Jadwal ----------\n")
-
-    # Input tanggal
-    print("Contoh tanggal: 25-12-2023")
-    tanggal = input("Masukkan tanggal penerbangan (dengan format DD-MM-YYYY) : ")
-    while (validasiTanggal(tanggal) == False):
-        print("Terdapat kesalahan input tanggal, pastikan format telah sesuai!")
-        header()
-        print("---------- Menu Input Jadwal ----------\n")
-        print("Contoh tanggal: 25-12-2023")
-        tanggal = input("Masukkan tanggal penerbangan (dengan format DD-MM-YYYY) : ")
-
-    # Input waktu
-    header()
-    print("---------- Menu Input Jadwal ----------\n")
-    print("Contoh waktu: 18:00")
-    waktu = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
-    while(validasiWaktu(waktu) == False):
-        print("Terdapat kesalahan input waktu, pastikan format telah sesuai!")
-        header()
-        print("---------- Menu Input Jadwal ----------\n")
-        print("Contoh waktu: 18:00")
-        waktu = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
-
-    return tanggal, waktu
-
-def buatJadwal():
     global arrOfKode
 
-    kode = inputKode()
-    idxKotaAsal, idxKotaTujuan = inputKota()
-    tanggal, waktu = inputJadwal()
+    kode = buatJadwal.inputKode(arrOfKode)
+    idxKotaAsal, idxKotaTujuan = buatJadwal.inputKota(arrOfKota)
+    tanggal, waktu = buatJadwal.inputTanggalWaktu()
 
     # Pengecekan konfirmasi
     header()
@@ -192,30 +78,51 @@ def buatJadwal():
         time.sleep(1)
     else:
         arrOfKode.append(kode)
-        payload = formattingJadwalBaru(kode, idxKotaAsal, idxKotaTujuan, tanggal, waktu)
+        payload = buatJadwal.formattingJadwalBaru(kode, idxKotaAsal, idxKotaTujuan, tanggal, waktu, arrOfKota)
         arrOfMsgObj.append(payload)
         dataOut = json.dumps(payload)
         client.publish("my/LionAIR/Notifikasi", dataOut, 1)
         print("Notifikasi berhasil dikirimkan")
+        time.sleep(1)
+
+def menuPerbaruiJadwal():
+    header()
+    print("---------- Perbarui Jadwal ----------\n")
+
+    kode = input("Masukkan (Y) jika Anda ingin melihat seluruh jadwal terlebih dahulu : ")
+    if kode == "Y":
+        printAllJadwal()
+
+    header()
+    print("---------- Perbarui Jadwal ----------\n")
+    kode = input("Masukkan kode dari jadwal yang ingin diperbarui : ")
+    while (kode not in arrOfKode):
+        print("\nKode jadwal tidak ditemukan! Ulangi masukan dengan data yang benar")
         time.sleep(2)
 
-def formattingJadwalBaru(kode, idxKotaAsal, idxKotaTujuan, tanggal, waktu):
-    waktuSekarang = datetime.datetime.now()
-    waktuSekarang = waktuSekarang.strftime("%Y-%m-%d %H:%M:%S")
+        header()
+        print("---------- Perbarui Jadwal ----------\n")
+        kode = input("Masukkan (Y) jika Anda ingin melihat seluruh jadwal terlebih dahulu : ")
+        if kode == "Y":
+            printAllJadwal()
+        
+        header()
+        print("---------- Perbarui Jadwal ----------\n")
+        kode = "JT" + input("Masukkan kode dari jadwal yang ingin diperbarui : ")
 
-    jsonData = {"kode": kode,
-                "kotaAsal": arrOfKota[idxKotaAsal],
-                "kotaTujuan": arrOfKota[idxKotaTujuan],
-                "tanggal": tanggal,
-                "waktu": waktu,
-                "dibuat": waktuSekarang,
-                "diedit": "-"}
+    perbaruiJadwal.perbarui(kode, arrOfKode, arrOfKota, arrOfMsgObj)
 
-    return jsonData
-
-def getNotifikasi():
+def printAllJadwal():
+    """
+    Mencetak semua jadwal yang telah dibuat
+    """
     global arrOfMsgObj
-    print("Terdapat " + str(len(arrOfMsgObj)) + " jadwal yang telah dibuat, yakni sebagai berikut:")
+
+    header()
+    print("---------- Daftar Jadwal ----------\n")
+
+    print("Terdapat " + str(len(arrOfMsgObj)) + " jadwal yang telah dibuat, yakni sebagai berikut:\n")
+    print("\n-------------------------------------------\n")
     for i in arrOfMsgObj:
         print("Kode penerbangan      : ", i["kode"])
         print("Asal                  : ", i["kotaAsal"])
@@ -224,16 +131,21 @@ def getNotifikasi():
         print("Waktu Keberangkatan   : ", i["waktu"])
         print("Dibuat pada           : ", i["dibuat"])
         print("Terakhir diedit       : ", i["diedit"])
-        print("-------------------------------------------")
+        print("\n-------------------------------------------\n")
 
-    input("\nOk...")
+    input("Ok...")
+
 
 def menu():
+    """
+    Menu sederhana untuk mengontrol flow aplikasi
+    """
     header()
     print("(1) Buat jadwal penerbangan baru")
     print("(2) Perbarui jadwal penerbangan")
     print("(3) Lihat jadwal penerbangan")
     print("(0) Keluar dari program")
+
 
 # --------------------- Main Program ---------------------
 arrOfKode = []
@@ -244,22 +156,24 @@ arrOfKota = ["Jakarta    (Bandara Internasional Soekarno–Hatta)",
              "Surabaya   (Bandara Internasional Juanda)",
              "Makassar   (Bandara Internasional Sultan Hasanuddin)",
              "Medan      (Bandara Internasional Kualanamu)",
-             "Yogyakarta (Bandara Internasional Adisutjipto)",
+             "Yogyakarta (Bandara Internasional Yogyakarta)",
              "Batam      (Bandara Internasional Hang Nadim)",
              "Palembang  (Bandara Internasional Sultan Mahmud Badaruddin II)",
+             "Semarang   (Bandara Internasional Jenderal Ahmad Yani)",
              "Bandung    (Bandara Internasional Kertajati)",
-             "Bandung    (Bandara Internasional Kertajati)",]
+             "Pontianak  (Bandara Internasional Supadio)",
+             "Mataram    (Bandara Zainuddin Abdul Madjid)",]
 
 menu()
 inputMenu = int(input("\nPilihan menu : "))
 while inputMenu != 0:
     match inputMenu:
         case 1:
-            buatJadwal()
+            menuBuatJadwal()
         case 2:
-            pass
+            menuPerbaruiJadwal()
         case 3:
-            pass
+            printAllJadwal()
         case default:
             print("Masukan tidak valid, ulangi lagi.")
             time.sleep(1)
