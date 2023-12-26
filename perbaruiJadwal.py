@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import validator
 import datetime
 
@@ -109,36 +110,3 @@ def perbaruiTanggalWaktu(tanggalLama, waktuLama):
         waktuBaru = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
 
     return tanggalBaru, waktuBaru
-
-
-def perbarui(kode, arrOfKode, arrOfKota, arrOfMsgObj):
-    for i in arrOfMsgObj:
-        if i["kode"] == kode:
-            header()
-            print("---------- Menu Perbarui ----------\n")
-            print(f"Kode sekarang : {i["kode"]}")
-            inputMenu = input("Perbarui kode? (Y) untuk iya : ")
-            if inputMenu == "Y" or inputMenu == "y":
-                i["kode"] = perbaruiKode(i["kode"], arrOfKode)
-
-            header()
-            print("---------- Menu Perbarui ----------\n")
-            print(f"Kota asal sekarang   : {i["kotaAsal"]}")
-            print(f"Kota tujuan sekarang : {i["kotaTujuan"]}")
-            inputMenu = input("Perbarui kota asal/tujuan? (Y) untuk iya : ")
-            if inputMenu == "Y" or inputMenu == "y":
-                idxKotaAsal, idxKotaTujuan = perbaruiKota(i["kotaAsal"], i["kotaTujuan"], arrOfKota)
-                i["kotaAsal"] = arrOfKota[idxKotaAsal]
-                i["kotaTujuan"] = arrOfKota[idxKotaTujuan]
-
-            header()
-            print("---------- Menu Perbarui ----------\n")
-            print(f"Tanggal sekarang : {i["tanggal"]}")
-            print(f"Waktu sekarang : {i["waktu"]}")
-            inputMenu = input("Perbarui tanggal/waktu? (Y) untuk iya : ")
-            if inputMenu == "Y" or inputMenu == "y":
-                i["tanggal"], i["waktu"] = perbaruiTanggalWaktu(i["tanggal"], i["waktu"])
-           
-            waktuSekarang = datetime.datetime.now()
-            waktuSekarang = waktuSekarang.strftime("%Y-%m-%d %H:%M:%S")
-            i["diedit"] = waktuSekarang
