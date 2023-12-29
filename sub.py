@@ -16,7 +16,7 @@ def on_connect(client, userdata, flags, rc):
     rc: integer, result code dari percobaan koneksi ke server (broker)
     """
     if rc == 0:
-        print("Tersambung dengan client")
+        print("Tersambung dengan client\n")
     else:
         print(f"Koneksi error, dengan kode {rc}")
 
@@ -37,6 +37,7 @@ def on_message(client, userdata, message):
         time.sleep(2)
         client.disconnect()
     else:
+        print(messageObj["notif"])
         print("kode penerbangan      : ", messageObj["kode"])
         print("asal                  : ", messageObj["kotaAsal"])
         print("tujuan                : ", messageObj["kotaTujuan"])
@@ -50,15 +51,15 @@ def on_message(client, userdata, message):
         with open("boarding.txt", "a") as f:
             f.write("Kode Penerbangan : "+messageObj["kode"]+"\n"
                     "Tanggal Keberangkatan : "+messageObj["tanggal"]+"\n"
-                    "Diterima pada : "+ waktuTerima +"\n")
+                    "Diterima pada : "+ waktuTerima +"\n\n")
 
         with open('lokasi.txt', 'a') as f:
             f.write("Kode Penerbangan : "+messageObj["kode"]+"\n"
                     "Asal : "+messageObj["kotaAsal"]+"\n"
                     "Tujuan : "+messageObj["kotaTujuan"]+"\n"
-                    "Diterima pada : "+ waktuTerima +"\n")
+                    "Diterima pada : "+ waktuTerima +"\n\n")
 
-        print("File boarding.txt dan lokasi.txt telah diperbarui")
+        print("File boarding.txt dan lokasi.txt telah diperbarui\n")
 
         global arrOfMsgObj
         arrOfMsgObj.append(messageObj)
@@ -128,6 +129,7 @@ def getNotifikasi():
     global arrMsgObj
     print("Ada "+str(len(arrOfMsgObj))+" Notifikasi Pada Session ini ")
     for i in arrOfMsgObj:
+        print(i["notif"])
         print("kode penerbangan      : ", i["kode"])
         print("asal                  : ", i["kotaasal"])
         print("tujuan                : ", i["kotatujuan"])
@@ -140,6 +142,7 @@ def getNotifikasi():
     input("\nOk ...")
 
 # --------------------- Main -------------------------
+clearScreen()
 arrOfMsgObj = []
 menu()
 menuInput = input("Silahkan Pilih Mode Notifikasi : ")
