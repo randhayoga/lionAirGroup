@@ -1,8 +1,6 @@
 import os
 import time
-import json
 import validator
-import datetime
 
 clearScreen = lambda: os.system("cls" if os.name in ("nt", "dos") else "clear")
 
@@ -15,6 +13,9 @@ def header():
 def perbaruiKode(kodeLama, arrOfKode):
     """
     Memperbarui kode penerbangan Lion Air yang didapat dari masukan user
+
+    kodeLama: string, kode penerbangan yang lama
+    arrOfKode: list, yang berisi seluruh kode penerbangan yang telah dibuat
     """
     header()
     print("---------- Menu Perbarui Kode Penerbangan ----------\n")
@@ -22,14 +23,6 @@ def perbaruiKode(kodeLama, arrOfKode):
     print("Contoh kode baru : '523'")
 
     kodeBaru = "JT" + input("Masukkan kode penerbangan baru : ")
-    while kodeBaru in arrOfKode:
-        print("\nKode penerbangan telah digunakan!")
-        time.sleep(1)
-        header()
-        print("---------- Menu Input Kode Penerbangan ----------\n")
-        print(f"Kode sekarang   : {kodeLama}")
-        print("Contoh kode: '523'")
-        kodeBaru = "JT" + input("Masukkan kode penerbangan baru : ")
 
     # Ganti kodeLama dengan kodeBaru pada list kode
     arrOfKode[arrOfKode.index(kodeLama)] = kodeBaru
@@ -45,7 +38,7 @@ def perbaruiKota(kotaAsalLama, kotaTujuanLama, arrOfKota):
     print(f"Kota asal sekarang   : {kotaAsalLama}")
     print(f"Kota tujuan sekarang : {kotaTujuanLama}")
 
-    # List kota
+    # Mencetak semua kota
     i = 1
     for kota in arrOfKota:
         print(f"({i}) {kota}")
@@ -56,7 +49,7 @@ def perbaruiKota(kotaAsalLama, kotaTujuanLama, arrOfKota):
 
     while validator.validasiRute(idxAsalBaru, idxTujuanBaru, arrOfKota) == False:
         print("Rute tidak valid, pastikan angka sudah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
 
         header()
         print("---------- Menu Perbarui Kota Asal & Tujuan ----------\n")
@@ -78,8 +71,11 @@ def perbaruiKota(kotaAsalLama, kotaTujuanLama, arrOfKota):
 def perbaruiTanggalWaktu(tanggalLama, waktuLama):
     """
     Memperbarui tanggal dan waktu penerbangan
+
+    tangalLama: string, tanggal keberangkatan yang lama
+    waktuLama: string, waktu keberangkatan yang lama
     """
-    # Perbarui jadwal
+    # Perbarui tanggal
     header()
     print("---------- Menu Perbarui Jadwal ----------\n")
     print(f"Tanggal sekarang : {tanggalLama}")
@@ -89,7 +85,7 @@ def perbaruiTanggalWaktu(tanggalLama, waktuLama):
     )
     while validator.validasiTanggal(tanggalBaru) == False:
         print("Terdapat kesalahan input tanggal, pastikan format telah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
         header()
         print("---------- Menu Perbarui Jadwal ----------\n")
         print(f"Tanggal sekarang : {tanggalLama}")
@@ -106,7 +102,7 @@ def perbaruiTanggalWaktu(tanggalLama, waktuLama):
     waktuBaru = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
     while validator.validasiWaktu(waktuBaru) == False:
         print("Terdapat kesalahan input waktu, pastikan format telah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
         header()
         print("---------- Menu Perbarui Jadwal ----------\n")
         print(f"Waktu sekarang : {waktuLama}")

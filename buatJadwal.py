@@ -11,7 +11,7 @@ def header():
     print("============= Program Jadwal Penerbangan =============\n")
 
 
-def inputKode(arrOfKode):
+def inputKode():
     """
     Mengembalikan kode penerbangan Lion Air yang didapat dari masukan user
     """
@@ -27,6 +27,8 @@ def inputKode(arrOfKode):
 def inputKota(arrOfKota):
     """
     Mengembalikan kota asal dan kota tujuan penerbangan berdasarkan masukan user
+
+    arrOfKota: list, yang berisi daftar kota yang dapat dipilih sebagai asal dan tujuan
     """
     header()
     print("---------- Menu Pemilihan Kota Asal & Tujuan ----------\n")

@@ -68,7 +68,7 @@ def menuBuatJadwal():
     """
     global arrOfKode
 
-    kode = buatJadwal.inputKode(arrOfKode)
+    kode = buatJadwal.inputKode()
     idxKotaAsal, idxKotaTujuan = buatJadwal.inputKota(arrOfKota)
     tanggal, waktu = buatJadwal.inputTanggalWaktu()
 
