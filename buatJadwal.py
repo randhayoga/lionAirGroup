@@ -44,7 +44,7 @@ def inputKota(arrOfKota):
 
     while validator.validasiRute(idxKotaAsal, idxKotaTujuan, arrOfKota) == False:
         print("Rute tidak valid, pastikan angka sudah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
 
         header()
         print("---------- Menu Pemilihan Kota Asal & Tujuan ----------\n")
@@ -73,7 +73,7 @@ def inputTanggalWaktu():
     tanggal = input("Masukkan tanggal penerbangan (dengan format DD-MM-YYYY) : ")
     while validator.validasiTanggal(tanggal) == False:
         print("Terdapat kesalahan input tanggal, pastikan format telah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
         header()
         print("---------- Menu Input Jadwal ----------\n")
         print("Contoh tanggal: 25-12-2023")
@@ -86,7 +86,7 @@ def inputTanggalWaktu():
     waktu = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
     while validator.validasiWaktu(waktu) == False:
         print("Terdapat kesalahan input waktu, pastikan format telah sesuai!")
-        time.sleep(1)
+        time.sleep(2)
         header()
         print("---------- Menu Input Jadwal ----------\n")
         print("Contoh waktu: 18:00")

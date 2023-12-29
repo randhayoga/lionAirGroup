@@ -66,7 +66,7 @@ def menuBuatJadwal():
     Membuat jadwal penerbangan baru secara lengkap dan menyimpannya ke dalam 
     sebuah array
     """
-    global arrOfKode
+    global arrOfKode, arrOfMsgObj
 
     kode = buatJadwal.inputKode()
     idxKotaAsal, idxKotaTujuan = buatJadwal.inputKota(arrOfKota)
@@ -86,7 +86,7 @@ def menuBuatJadwal():
     konfirm = input("n untuk Cancel, enter jika sudah benar : ")
     if (konfirm == "n"):
         print("\nPembuatan jadwal dibatalkan...")
-        time.sleep(1)
+        time.sleep(2)
     else:
         arrOfKode.append(kode)
         payload = buatJadwal.formattingJadwalBaru(kode, idxKotaAsal, idxKotaTujuan, tanggal, waktu, arrOfKota)
@@ -108,6 +108,9 @@ def menuBuatJadwal():
 
 
 def menuPerbaruiJadwal():
+    """
+    Memperbarui jadwal penerbangan berdasarkan masukan dari user 
+    """
     global arrOfKode
 
     header()
@@ -122,7 +125,7 @@ def menuPerbaruiJadwal():
     kode = input("Masukkan kode dari jadwal yang ingin diperbarui : ")
     while (kode not in arrOfKode):
         print("\nKode jadwal tidak ditemukan! Ulangi masukan dengan data yang benar")
-        time.sleep(1)
+        time.sleep(2)
 
         header()
         print("---------- Perbarui Jadwal ----------\n")
@@ -136,14 +139,19 @@ def menuPerbaruiJadwal():
 
     for i in arrOfMsgObj:
         if i["kode"] == kode:
-            i["notif"] = "Terdapat jadwal penerbangan yang diperbarui!"
+            notifBaru = "Terdapat jadwal penerbangan yang diperbarui!"
+            kodeBaru = kode
+            tanggalBaru = i["tanggal"]
+            waktuBaru = i["waktu"]
+            kotaAsalBaru = i["kotaAsal"]
+            kotaTujuanBaru = i["kotaTujuan"]
 
             header()
             print("---------- Menu Perbarui ----------\n")
             print(f"Kode sekarang : {i["kode"]}")
             inputMenu = input("Perbarui kode? (Y) untuk iya : ")
             if inputMenu == "Y" or inputMenu == "y":
-                i["kode"] = perbaruiJadwal.perbaruiKode(i["kode"], arrOfKode)
+                kodeBaru = perbaruiJadwal.perbaruiKode(i["kode"], arrOfKode)
 
             header()
             print("---------- Menu Perbarui ----------\n")
@@ -152,8 +160,8 @@ def menuPerbaruiJadwal():
             inputMenu = input("Perbarui kota asal/tujuan? (Y) untuk iya : ")
             if inputMenu == "Y" or inputMenu == "y":
                 idxKotaAsal, idxKotaTujuan = perbaruiJadwal.perbaruiKota(i["kotaAsal"], i["kotaTujuan"], arrOfKota)
-                i["kotaAsal"] = arrOfKota[idxKotaAsal]
-                i["kotaTujuan"] = arrOfKota[idxKotaTujuan]
+                kotaAsalBaru = arrOfKota[idxKotaAsal]
+                kotaTujuanBaru = arrOfKota[idxKotaTujuan]
 
             header()
             print("---------- Menu Perbarui ----------\n")
@@ -161,16 +169,34 @@ def menuPerbaruiJadwal():
             print(f"Waktu sekarang : {i["waktu"]}")
             inputMenu = input("Perbarui tanggal/waktu? (Y) untuk iya : ")
             if inputMenu == "Y" or inputMenu == "y":
-                i["tanggal"], i["waktu"] = perbaruiJadwal.perbaruiTanggalWaktu(i["tanggal"], i["waktu"])
+                tanggalBaru, waktuBaru = perbaruiJadwal.perbaruiTanggalWaktu(i["tanggal"], i["waktu"])
            
             waktuSekarang = datetime.datetime.now()
             waktuSekarang = waktuSekarang.strftime("%Y-%m-%d %H:%M:%S")
-            i["diedit"] = waktuSekarang
 
-            dataOut = json.dumps(i)
-            client.publish("lionAir/Notif", dataOut, 1)
-            print("Notifikasi berhasil dikirimkan")
-            time.sleep(1)
+            # Mengecek apakah sudah ada data boarding dan transit yang sama
+            isSend = True
+            for i in arrOfMsgObj:
+                if i["tanggal"] == tanggalBaru and i["waktu"] == waktuBaru and i["kotaAsal"] == kotaAsalBaru and i["kotaTujuan"] == kotaTujuanBaru:
+                    isSend = False
+
+            if isSend:
+                i["notif"] = notifBaru
+                i["kode"] = kodeBaru
+                i["kotaAsal"] = kotaAsalBaru
+                i["kotaTujuan"] = kotaTujuanBaru
+                i["tanggal"] = tanggalBaru
+                i["waktu"] = waktuBaru
+                i["diedit"] = waktuSekarang
+
+                dataOut = json.dumps(i)
+                client.publish("lionAir/Notif", dataOut, 1)
+                print("Notifikasi berhasil dikirimkan")
+            else:
+                
+                print("Perubahan tidak disimpan dan notifikasi tidak dikirimkan karena terdapat jadwal boarding dan lokasi transit yang sama")
+
+            time.sleep(2)
 
 
 def printAllJadwal():
@@ -237,7 +263,7 @@ while inputMenu != 0:
             printAllJadwal()
         case default:
             print("Masukan tidak valid, ulangi lagi.")
-            time.sleep(1)
+            time.sleep(2)
 
     menu()
     inputMenu = int(input("\nPilihan menu : "))
