@@ -36,9 +36,11 @@ client = mqtt.Client("Publisher", clean_session=False)
 client.on_connect = on_connect
 client.on_message = on_message
 
+
 # Menghidupkan TLS
 client.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS)
 client.username_pw_set("admin", "Adm1nAdm1n")
+
 
 # Menyambungkan client Publisher dengan broker hivemq pada port 8883
 print("Menyambungkan ke broker...")
@@ -88,11 +90,21 @@ def menuBuatJadwal():
     else:
         arrOfKode.append(kode)
         payload = buatJadwal.formattingJadwalBaru(kode, idxKotaAsal, idxKotaTujuan, tanggal, waktu, arrOfKota)
-        arrOfMsgObj.append(payload)
-        dataOut = json.dumps(payload)
-        client.publish("lionAir/Notif", dataOut, 1)
-        print("Notifikasi berhasil dikirimkan")
-        time.sleep(1)
+        isSend = True
+
+        for i in arrOfMsgObj:
+            if i["tanggal"] == tanggal and i["waktu"] == waktu and i["kotaAsal"] == arrOfKota[idxKotaAsal] and i["kotaTujuan"] == arrOfKota[idxKotaTujuan]:
+                isSend = False
+
+        if isSend:
+            arrOfMsgObj.append(payload)
+            dataOut = json.dumps(payload)
+            client.publish("lionAir/Notif", dataOut, 1)
+            print("Notifikasi berhasil dikirimkan")
+
+        else:
+            print("Notifikasi tidak dikirimkan karena terdapat jadwal boarding dan lokasi transit yang sama")
+        time.sleep(2)
 
 
 def menuPerbaruiJadwal():
@@ -110,7 +122,7 @@ def menuPerbaruiJadwal():
     kode = input("Masukkan kode dari jadwal yang ingin diperbarui : ")
     while (kode not in arrOfKode):
         print("\nKode jadwal tidak ditemukan! Ulangi masukan dengan data yang benar")
-        time.sleep(2)
+        time.sleep(1)
 
         header()
         print("---------- Perbarui Jadwal ----------\n")

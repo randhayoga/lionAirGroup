@@ -1,6 +1,7 @@
 # Import libraries
 import paho.mqtt.client as mqtt
 import os
+import sys
 import json
 import time
 import requests
@@ -84,7 +85,18 @@ client.subscribe("lionAir/Notif", 1)
 clearScreen = lambda: os.system("cls" if os.name in ("nt", "dos") else "clear")
 
 
+def header():
+    clearScreen()
+    print("============= Program Penerima Jadwal Penerbangan =============\n")
+
+
 def cekKode(kode):
+    """
+    Mengecek apakah kode penerbangan tertentu sudah pernah diterima 
+    notifikasinya
+
+    kode: string, kode penerbangan dari message yang diterima dari pub
+    """
     global arrOfMsgObj
     for messageObj in arrOfMsgObj:
         if kode in messageObj["kode"]:
@@ -94,59 +106,58 @@ def cekKode(kode):
 
 
 def menu():
+    """
+    Menu sederhana untuk mengontrol flow aplikasi
+    """
+    header()
     print("(1) Dapatkan notifikasi")
-    print("(2) Liat semua notifikasi")
     print("(0) Keluar dari program")
 
 
 def inputStop():
+    """
+    Menghentikan input dan memutuskan koneksi klien
+    """
     input()
     client.disconnect()
-    menu()
-
 
 def loopForever():
+    """
+    Menghubungkan klien sub ke broker dan menjalankan klien secara terus-menerus.
+    """
     client.connect("431e1591f5c743efa435fc1f6fcc032b.s1.eu.hivemq.cloud", 8883)
     clearScreen()
     client.loop_forever()
 
 
 def fetchNotifikasi():
-	Thread(target = loopForever).start()
-	Thread(target = inputStop).start()
+    """
+    Memulai dua thread untuk mendapatkan notifikasi secara real-time, yaitu 
+    loopForever() dan inputStop().
+    """
+    print("Hint: tekan enter, jika ingin keluar dari program")
+    Thread(target = loopForever).start()
+    Thread(target = inputStop).start()
 
 
-# Paralel Thread agar tidak Blocking oleh si loop forevernya
 def switchMenu(inputan):
-	if inputan=='1':
-		fetchNotifikasi()
-	elif inputan=='2':
-		getNotifikasi()
-	else:
-		inputan=='0'
-
-def getNotifikasi():
-    global arrMsgObj
-    print("Ada "+str(len(arrOfMsgObj))+" Notifikasi Pada Session ini ")
-    for i in arrOfMsgObj:
-        print(i["notif"])
-        print("kode penerbangan      : ", i["kode"])
-        print("asal                  : ", i["kotaasal"])
-        print("tujuan                : ", i["kotatujuan"])
-        print("tanggal keberangkatan : ", i["tanggal"])
-        print("waktu keberangkatan   : ", i["waktu"])
-        print("dibuat pada           : ", i["dibuat"])
-        print("terakhir diedit       : ", i["diedit"])
-        print("\n-------------------------------------------\n")
-
-    input("\nOk ...")
+    """
+    Logika pemilihan untuk menu sederhana
+    """
+    if inputan=='1':
+        fetchNotifikasi()
+    else:
+        inputan=='0'
 
 # --------------------- Main -------------------------
-clearScreen()
 arrOfMsgObj = []
+
 menu()
-menuInput = input("Silahkan Pilih Mode Notifikasi : ")
+menuInput = input("\nPilihan menu : ")
 while (menuInput != '0'):
     switchMenu(menuInput)
     menu()
-    menuInput = input("Silahkan Pilih Mode Notifikasi : ")
+    menuInput = input("\nPilihan menu : ")
+
+print("Keluar dari program ...")
+sys.exit()

@@ -20,13 +20,6 @@ def inputKode(arrOfKode):
     print("Contoh kode: '523'")
 
     kode = "JT" + input("Masukkan kode penerbangan : ")
-    while kode in arrOfKode:
-        print("\nKode penerbangan telah digunakan!")
-        time.sleep(1)
-        header()
-        print("---------- Menu Input Kode Penerbangan ----------\n")
-        print("Contoh kode: '523'")
-        kode = "JT" + input("Masukkan kode penerbangan : ")
 
     return kode
 
@@ -78,6 +71,7 @@ def inputTanggalWaktu():
     tanggal = input("Masukkan tanggal penerbangan (dengan format DD-MM-YYYY) : ")
     while validator.validasiTanggal(tanggal) == False:
         print("Terdapat kesalahan input tanggal, pastikan format telah sesuai!")
+        time.sleep(1)
         header()
         print("---------- Menu Input Jadwal ----------\n")
         print("Contoh tanggal: 25-12-2023")
@@ -90,6 +84,7 @@ def inputTanggalWaktu():
     waktu = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
     while validator.validasiWaktu(waktu) == False:
         print("Terdapat kesalahan input waktu, pastikan format telah sesuai!")
+        time.sleep(1)
         header()
         print("---------- Menu Input Jadwal ----------\n")
         print("Contoh waktu: 18:00")

@@ -31,6 +31,8 @@ def perbaruiKode(kodeLama, arrOfKode):
         print("Contoh kode: '523'")
         kodeBaru = "JT" + input("Masukkan kode penerbangan baru : ")
 
+    # Ganti kodeLama dengan kodeBaru pada list kode
+    arrOfKode[arrOfKode.index(kodeLama)] = kodeBaru
     return kodeBaru
 
 
@@ -87,6 +89,7 @@ def perbaruiTanggalWaktu(tanggalLama, waktuLama):
     )
     while validator.validasiTanggal(tanggalBaru) == False:
         print("Terdapat kesalahan input tanggal, pastikan format telah sesuai!")
+        time.sleep(1)
         header()
         print("---------- Menu Perbarui Jadwal ----------\n")
         print(f"Tanggal sekarang : {tanggalLama}")
@@ -103,6 +106,7 @@ def perbaruiTanggalWaktu(tanggalLama, waktuLama):
     waktuBaru = input("Masukkan waktu penerbangan (dengan format HH:MM) : ")
     while validator.validasiWaktu(waktuBaru) == False:
         print("Terdapat kesalahan input waktu, pastikan format telah sesuai!")
+        time.sleep(1)
         header()
         print("---------- Menu Perbarui Jadwal ----------\n")
         print(f"Waktu sekarang : {waktuLama}")
